@@ -1,0 +1,25 @@
+{
+  "name": "mall-frontend",
+  "version": "1.0.0",
+  "description": "购物商城前端系统",
+  "main": "main.js",
+  "scripts": {
+    "dev": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
+  },
+  "dependencies": {
+    "vue": "^2.6.11",
+    "vue-router": "^3.5.1",
+    "vuex": "^3.6.2",
+    "element-ui": "^2.15.6",
+    "axios": "^0.21.1",
+    "js-cookie": "^3.0.1"
+  },
+  "devDependencies": {
+    "@vue/cli-service": "^4.5.13",
+    "@vue/cli-plugin-router": "^4.5.13",
+    "@vue/cli-plugin-vuex": "^4.5.13",
+    "@vue/cli-plugin-eslint": "^4.5.13"
+  }
+}
