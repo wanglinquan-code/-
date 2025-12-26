@@ -7,25 +7,27 @@ class ProductsPage {
   }
 
   // 创建页面DOM
-  createElement() {
-    const div = document.createElement('div');
-    div.className = 'products-page';
-    div.innerHTML = `
-      <div class="header">
-        <h1>商品列表（来自MySQL数据库）</h1>
-        <div class="search-box">
-          <input type="text" id="search-input" placeholder="搜索商品...">
-          <button id="search-btn">搜索</button>
-        </div>
+createElement() {
+  const div = document.createElement('div');
+  div.className = 'products-page';
+  div.innerHTML = `
+    <div class="header">
+      <h1>商品列表（来自MySQL数据库）</h1>
+      <!-- 新增：购物车入口按钮 -->
+      <button id="cart-btn" style="margin-right: 10px;">我的购物车</button>
+      <div class="search-box">
+        <input type="text" id="search-input" placeholder="搜索商品...">
+        <button id="search-btn">搜索</button>
       </div>
-      <div class="product-list" id="product-list"></div>
-      <div class="error-message" id="error-message"></div>
-    `;
-    this.element = div;
-    this.addStyles();
-    this.bindEvents();
-    return div;
-  }
+    </div>
+    <div class="product-list" id="product-list"></div>
+    <div class="error-message" id="error-message"></div>
+  `;
+  this.element = div;
+  this.addStyles();
+  this.bindEvents();
+  return div;
+}
 
   // 添加样式
   addStyles() {
@@ -49,18 +51,24 @@ class ProductsPage {
 
   // 绑定事件
   bindEvents() {
-    // 搜索按钮事件
-    const searchBtn = this.element.querySelector('#search-btn');
-    const searchInput = this.element.querySelector('#search-input');
-    searchBtn.addEventListener('click', async () => {
-      const keyword = searchInput.value.trim();
-      try {
-        this.products = await searchProducts(keyword);
-        this.renderProducts();
-      } catch (error) {
-        this.element.querySelector('#error-message').textContent = error.message;
-      }
-    });
+  // 新增：购物车按钮点击事件
+  this.element.querySelector('#cart-btn').addEventListener('click', () => {
+    window.location.hash = '#/cart'; // 跳转到购物车页面
+  });
+
+  // 原有搜索按钮事件
+  const searchBtn = this.element.querySelector('#search-btn');
+  const searchInput = this.element.querySelector('#search-input');
+  searchBtn.addEventListener('click', async () => {
+    const keyword = searchInput.value.trim();
+    try {
+      this.products = await searchProducts(keyword);
+      this.renderProducts();
+    } catch (error) {
+      this.element.querySelector('#error-message').textContent = error.message;
+    }
+  });
+
 
     // 回车搜索
     searchInput.addEventListener('keydown', (e) => {

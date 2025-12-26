@@ -22,27 +22,27 @@ class App {
   }
 
   // 路由处理 + 权限控制
-  handleRouteChange() {
-    const hash = window.location.hash;
-    const isLogin = !!localStorage.getItem('token');
+handleRouteChange() {
+  const hash = window.location.hash;
+  const isLogin = !!localStorage.getItem('token');
 
-    // 保护结算页：未登录跳转到登录页
-    if (hash === '#/checkout' && !isLogin) {
-      alert('请先登录再结算！');
-      window.location.hash = '#/login';
-      return;
-    }
-
-    // 获取当前路由组件
-    const Page = this.routes[hash] || this.routes['#/'];
-    const page = new Page();
-
-    // 渲染页面
-    this.app.innerHTML = '';
-    this.app.appendChild(page.createElement());
-    // 执行页面初始化（如加载商品）
-    if (page.mount) page.mount();
+  // 保护结算页：未登录跳转到登录页
+  if (hash === '#/checkout' && !isLogin) {
+    alert('请先登录再结算！');
+    window.location.hash = '#/login';
+    return;
   }
+
+  // 获取当前路由组件
+  const Page = this.routes[hash] || this.routes['#/'];
+  const page = new Page();
+
+  // 渲染页面
+  this.app.innerHTML = '';
+  this.app.appendChild(page.createElement());
+  // 关键：确保mount方法执行（CartPage的mount会加载购物车）
+  if (page.mount) page.mount(); // 这一行必须保留！
+}
 }
 
 // 启动应用
