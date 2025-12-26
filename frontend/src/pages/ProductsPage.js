@@ -1,159 +1,126 @@
-// 商品展示页面
-import ProductList from '../components/ProductList.js';
-import { fetchProducts } from '../services/api.js';
+import { getProducts, searchProducts } from '../services/api';
 
 class ProductsPage {
   constructor() {
     this.element = null;
-    this.productList = null;
     this.products = [];
   }
 
-  // 创建DOM元素
-  async createElement() {
+  // 创建页面DOM
+  createElement() {
     const div = document.createElement('div');
     div.className = 'products-page';
     div.innerHTML = `
-      <h2>商品展示</h2>
-      <div class="container">
-        <div id="product-list-container"></div>
-        <div id="loading" style="text-align: center; padding: 20px;">加载中...</div>
-        <div id="error" style="text-align: center; padding: 20px; color: red; display: none;"></div>
+      <div class="header">
+        <h1>商品列表（来自MySQL数据库）</h1>
+        <div class="search-box">
+          <input type="text" id="search-input" placeholder="搜索商品...">
+          <button id="search-btn">搜索</button>
+        </div>
       </div>
+      <div class="product-list" id="product-list"></div>
+      <div class="error-message" id="error-message"></div>
     `;
-    
     this.element = div;
-    await this.loadProducts();
+    this.addStyles();
+    this.bindEvents();
     return div;
   }
 
-  // 加载商品数据
+  // 添加样式
+  addStyles() {
+    const style = document.createElement('style');
+    style.textContent = `
+      .products-page { padding: 20px; max-width: 1200px; margin: 0 auto; }
+      .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+      .search-box { display: flex; gap: 10px; }
+      #search-input { padding: 8px; width: 200px; }
+      #search-btn { padding: 8px 16px; background: #ff6b81; color: white; border: none; border-radius: 4px; cursor: pointer; }
+      .product-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+      .product-item { border: 1px solid #eee; padding: 15px; border-radius: 8px; }
+      .product-item h3 { margin: 0 0 10px; font-size: 18px; }
+      .product-item .price { color: #ff6b81; font-weight: bold; margin: 10px 0; }
+      .product-item .desc { color: #666; font-size: 14px; margin: 10px 0; }
+      .product-item button { background: #ff6b81; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; }
+      .error-message { color: red; margin-top: 20px; }
+    `;
+    this.element.appendChild(style);
+  }
+
+  // 绑定事件
+  bindEvents() {
+    // 搜索按钮事件
+    const searchBtn = this.element.querySelector('#search-btn');
+    const searchInput = this.element.querySelector('#search-input');
+    searchBtn.addEventListener('click', async () => {
+      const keyword = searchInput.value.trim();
+      try {
+        this.products = await searchProducts(keyword);
+        this.renderProducts();
+      } catch (error) {
+        this.element.querySelector('#error-message').textContent = error.message;
+      }
+    });
+
+    // 回车搜索
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') searchBtn.click();
+    });
+  }
+
+  // 从数据库加载商品
   async loadProducts() {
     try {
-      // 实际项目中应该调用API获取数据
-      // this.products = await fetchProducts();
-      
-      // 模拟商品数据
-      this.products = [
-        { id: 1, name: '智能手表', price: 1999.00, imageUrl: 'https://via.placeholder.com/200' },
-        { id: 2, name: '无线耳机', price: 999.00, imageUrl: 'https://via.placeholder.com/200' },
-        { id: 3, name: '智能手机', price: 5999.00, imageUrl: 'https://via.placeholder.com/200' },
-        { id: 4, name: '平板电脑', price: 3999.00, imageUrl: 'https://via.placeholder.com/200' },
-        { id: 5, name: '笔记本电脑', price: 7999.00, imageUrl: 'https://via.placeholder.com/200' },
-        { id: 6, name: '智能音箱', price: 499.00, imageUrl: 'https://via.placeholder.com/200' }
-      ];
-      
-      this.renderProductList();
-      this.hideLoading();
+      this.element.querySelector('#error-message').textContent = '';
+      this.products = await getProducts(); // 调用API获取数据库商品
+      this.renderProducts();
     } catch (error) {
-      this.showError('加载商品失败：' + error.message);
-      this.hideLoading();
+      this.element.querySelector('#error-message').textContent = `加载失败：${error.message}`;
+      console.error('加载商品失败:', error);
     }
   }
 
   // 渲染商品列表
-  renderProductList() {
-    const container = this.element.querySelector('#product-list-container');
-    this.productList = new ProductList(this.products);
-    const productListElement = this.productList.createElement();
-    container.appendChild(productListElement);
-    
-    // 设置加入购物车事件监听
-    this.productList.setOnAddToCartListener((productId) => {
-      this.handleAddToCart(productId);
-    });
-  }
+  renderProducts() {
+    const productList = this.element.querySelector('#product-list');
+    productList.innerHTML = '';
 
-  // 处理加入购物车
-  handleAddToCart(productId) {
-    const product = this.products.find(p => p.id === productId);
-    if (product) {
-      // 从本地存储获取购物车数据
-      let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-      
-      // 检查商品是否已在购物车中
-      const existingItem = cart.find(item => item.id === productId);
-      if (existingItem) {
-        // 增加数量
-        existingItem.quantity += 1;
-      } else {
-        // 添加新商品
-        cart.push({
-          ...product,
-          quantity: 1
-        });
-      }
-      
-      // 保存到本地存储
-      localStorage.setItem('cart', JSON.stringify(cart));
-      
-      // 更新购物车数量显示
-      this.updateCartCount();
-      
-      // 显示提示
-      this.showNotification(`${product.name} 已加入购物车`);
+    if (this.products.length === 0) {
+      productList.innerHTML = '<p>暂无商品（数据库中无数据）</p>';
+      return;
     }
-  }
 
-  // 更新购物车数量显示
-  updateCartCount() {
-    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    const total = cart.reduce((sum, item) => sum + item.quantity, 0);
-    
-    // 触发自定义事件，通知头部组件更新购物车数量
-    const event = new CustomEvent('updateCartCount', {
-      detail: { count: total },
-      bubbles: true
-    });
-    this.element.dispatchEvent(event);
-  }
+    // 遍历数据库商品渲染
+    this.products.forEach(product => {
+      const item = document.createElement('div');
+      item.className = 'product-item';
+      item.innerHTML = `
+        <h3>${product.name}</h3>
+        <div class="price">¥${product.price}</div>
+        <div class="desc">${product.description || '暂无描述'}</div>
+        <button data-id="${product.id}">加入购物车</button>
+      `;
 
-  // 显示通知
-  showNotification(message) {
-    // 创建通知元素
-    const notification = document.createElement('div');
-    notification.style.cssText = `
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background-color: #4caf50;
-      color: white;
-      padding: 12px 24px;
-      border-radius: 4px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-      z-index: 1000;
-      transition: all 0.3s;
-    `;
-    notification.textContent = message;
-    
-    document.body.appendChild(notification);
-    
-    // 3秒后移除通知
-    setTimeout(() => {
-      notification.style.opacity = '0';
-      setTimeout(() => {
-        if (notification.parentNode) {
-          notification.parentNode.removeChild(notification);
+      // 加入购物车事件（保留原有逻辑）
+      item.querySelector('button').addEventListener('click', () => {
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+        const existing = cart.find(item => item.id === product.id);
+        if (existing) {
+          existing.quantity += 1;
+        } else {
+          cart.push({ ...product, quantity: 1 });
         }
-      }, 300);
-    }, 3000);
+        localStorage.setItem('cart', JSON.stringify(cart));
+        alert(`${product.name} 已加入购物车！`);
+      });
+
+      productList.appendChild(item);
+    });
   }
 
-  // 隐藏加载状态
-  hideLoading() {
-    const loading = this.element.querySelector('#loading');
-    if (loading) {
-      loading.style.display = 'none';
-    }
-  }
-
-  // 显示错误信息
-  showError(message) {
-    const error = this.element.querySelector('#error');
-    if (error) {
-      error.textContent = message;
-      error.style.display = 'block';
-    }
+  // 页面挂载时加载数据
+  mount() {
+    this.loadProducts(); // 核心：加载数据库商品，替代本地数据
   }
 }
 
