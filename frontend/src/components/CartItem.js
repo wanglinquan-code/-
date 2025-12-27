@@ -9,18 +9,20 @@ class CartItem {
   createElement() {
     const div = document.createElement('div');
     div.className = 'cart-item';
+    // 确保price是数字类型
+    const price = typeof this.item.price === 'string' ? parseFloat(this.item.price) : this.item.price;
     div.innerHTML = `
       <img class="cart-item-image" src="${this.item.imageUrl || 'https://via.placeholder.com/80'}" alt="${this.item.name}">
       <div class="cart-item-info">
         <h4 class="cart-item-name">${this.item.name}</h4>
-        <p class="cart-item-price">¥${this.item.price.toFixed(2)}</p>
+        <p class="cart-item-price">¥${price.toFixed(2)}</p>
       </div>
       <div class="cart-item-quantity">
         <button class="quantity-btn decrease" data-id="${this.item.id}">-</button>
         <span class="quantity">${this.item.quantity}</span>
         <button class="quantity-btn increase" data-id="${this.item.id}">+</button>
       </div>
-      <div class="cart-item-total">¥${(this.item.price * this.item.quantity).toFixed(2)}</div>
+      <div class="cart-item-total">¥${(price * this.item.quantity).toFixed(2)}</div>
       <button class="remove-btn" data-id="${this.item.id}">删除</button>
     `;
     

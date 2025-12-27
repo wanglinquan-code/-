@@ -7,15 +7,13 @@ class ProductsPage {
     this.products = [];
   }
 
-  // 创建页面DOM结构（整合后保留购物车按钮+自定义标题）
+  // 创建页面DOM结构（购物车按钮在Header导航栏中，此处仅保留搜索）
   createElement() {
     const div = document.createElement('div');
     div.className = 'products-page';
     div.innerHTML = `
       <div class="header">
-        <h1>哈基米商品列表</h1>
-        <!-- 购物车入口按钮 -->
-        <button id="cart-btn" style="margin-right: 10px;">我的购物车</button>
+        <h1>商品列表</h1>
         <div class="search-box">
           <input type="text" id="search-input" placeholder="搜索商品...">
           <button id="search-btn">搜索</button>
@@ -30,26 +28,12 @@ class ProductsPage {
     return div;
   }
 
-  // 添加页面样式（保留所有样式+购物车按钮基础样式）
+  // 添加页面样式
   addStyles() {
     const style = document.createElement('style');
     style.textContent = `
       .products-page { padding: 20px; max-width: 1200px; margin: 0 auto; }
       .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-      /* 优化购物车按钮样式（可选，你可根据需求调整） */
-      #cart-btn {
-        padding: 8px 16px;
-        background: #ff6b81;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 14px;
-        transition: background 0.3s ease;
-      }
-      #cart-btn:hover {
-        background: #e85568;
-      }
       .search-box { display: flex; gap: 10px; }
       #search-input { padding: 8px; width: 200px; }
       #search-btn { padding: 8px 16px; background: #ff6b81; color: white; border: none; border-radius: 4px; cursor: pointer; }
@@ -64,14 +48,9 @@ class ProductsPage {
     this.element.appendChild(style);
   }
 
-  // 绑定所有事件（整合购物车按钮跳转+搜索+回车事件）
+  // 绑定所有事件（搜索+回车事件）
   bindEvents() {
-    // 1. 购物车按钮点击跳转事件
-    this.element.querySelector('#cart-btn').addEventListener('click', () => {
-      window.location.hash = '#/cart'; // 跳转到购物车路由
-    });
-
-    // 2. 搜索按钮点击事件
+    // 搜索按钮点击事件
     const searchBtn = this.element.querySelector('#search-btn');
     const searchInput = this.element.querySelector('#search-input');
     searchBtn.addEventListener('click', async () => {
@@ -84,7 +63,7 @@ class ProductsPage {
       }
     });
 
-    // 3. 回车触发搜索事件
+    // 回车触发搜索事件
     searchInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') searchBtn.click();
     });
