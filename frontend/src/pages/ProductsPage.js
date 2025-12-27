@@ -1,3 +1,4 @@
+// 导入API请求方法（需确保services/api.js路径正确）
 import { getProducts, searchProducts } from '../services/api';
 
 class ProductsPage {
@@ -6,13 +7,15 @@ class ProductsPage {
     this.products = [];
   }
 
-  // 创建页面DOM
+  // 创建页面DOM结构（整合后保留购物车按钮+自定义标题）
   createElement() {
     const div = document.createElement('div');
     div.className = 'products-page';
     div.innerHTML = `
       <div class="header">
-        <h1>商品列表（来自MySQL数据库）</h1>
+        <h1>哈基米商品列表</h1>
+        <!-- 购物车入口按钮 -->
+        <button id="cart-btn" style="margin-right: 10px;">我的购物车</button>
         <div class="search-box">
           <input type="text" id="search-input" placeholder="搜索商品...">
           <button id="search-btn">搜索</button>
@@ -27,12 +30,26 @@ class ProductsPage {
     return div;
   }
 
-  // 添加样式
+  // 添加页面样式（保留所有样式+购物车按钮基础样式）
   addStyles() {
     const style = document.createElement('style');
     style.textContent = `
       .products-page { padding: 20px; max-width: 1200px; margin: 0 auto; }
       .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+      /* 优化购物车按钮样式（可选，你可根据需求调整） */
+      #cart-btn {
+        padding: 8px 16px;
+        background: #ff6b81;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background 0.3s ease;
+      }
+      #cart-btn:hover {
+        background: #e85568;
+      }
       .search-box { display: flex; gap: 10px; }
       #search-input { padding: 8px; width: 200px; }
       #search-btn { padding: 8px 16px; background: #ff6b81; color: white; border: none; border-radius: 4px; cursor: pointer; }
@@ -47,9 +64,14 @@ class ProductsPage {
     this.element.appendChild(style);
   }
 
-  // 绑定事件
+  // 绑定所有事件（整合购物车按钮跳转+搜索+回车事件）
   bindEvents() {
-    // 搜索按钮事件
+    // 1. 购物车按钮点击跳转事件
+    this.element.querySelector('#cart-btn').addEventListener('click', () => {
+      window.location.hash = '#/cart'; // 跳转到购物车路由
+    });
+
+    // 2. 搜索按钮点击事件
     const searchBtn = this.element.querySelector('#search-btn');
     const searchInput = this.element.querySelector('#search-input');
     searchBtn.addEventListener('click', async () => {
@@ -62,13 +84,13 @@ class ProductsPage {
       }
     });
 
-    // 回车搜索
+    // 3. 回车触发搜索事件
     searchInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') searchBtn.click();
     });
   }
 
-  // 从数据库加载商品
+  // 从MySQL数据库加载商品数据
   async loadProducts() {
     try {
       this.element.querySelector('#error-message').textContent = '';
@@ -80,7 +102,7 @@ class ProductsPage {
     }
   }
 
-  // 渲染商品列表
+  // 渲染数据库中的商品列表
   renderProducts() {
     const productList = this.element.querySelector('#product-list');
     productList.innerHTML = '';
@@ -90,7 +112,7 @@ class ProductsPage {
       return;
     }
 
-    // 遍历数据库商品渲染
+    // 遍历数据库商品生成DOM
     this.products.forEach(product => {
       const item = document.createElement('div');
       item.className = 'product-item';
@@ -101,7 +123,7 @@ class ProductsPage {
         <button data-id="${product.id}">加入购物车</button>
       `;
 
-      // 加入购物车事件（保留原有逻辑）
+      // 加入购物车事件（存储到localStorage）
       item.querySelector('button').addEventListener('click', () => {
         const cart = JSON.parse(localStorage.getItem('cart')) || [];
         const existing = cart.find(item => item.id === product.id);
@@ -118,10 +140,11 @@ class ProductsPage {
     });
   }
 
-  // 页面挂载时加载数据
+  // 页面挂载时初始化加载商品
   mount() {
-    this.loadProducts(); // 核心：加载数据库商品，替代本地数据
+    this.loadProducts(); // 核心：加载数据库商品，替代本地模拟数据
   }
 }
 
+// 导出组件供main.js使用
 export default ProductsPage;

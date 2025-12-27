@@ -1,65 +1,75 @@
-// 头部导航组件
-import SearchBar from './SearchBar.js';
-
 class Header {
   constructor() {
     this.element = null;
-    this.searchBar = null;
-    this.cartCount = 0;
   }
 
-  // 创建DOM元素
   createElement() {
-    const header = document.createElement('header');
-    header.className = 'header';
-    header.innerHTML = `
-      <div class="container">
-        <a href="#/products" class="logo">购物商城</a>
-        <nav class="nav">
-          <a href="#/products">商品</a>
-          <a href="#/cart">购物车 <span class="cart-count" id="cart-count">0</span></a>
-        </nav>
-        <div id="search-bar-container"></div>
+    const div = document.createElement('div');
+    div.className = 'global-header';
+    div.innerHTML = `
+      <div class="header-container">
+        <h2 class="logo">电商购物平台</h2>
+        <div class="nav-links">
+          <a href="#/products" class="nav-link">商品列表</a>
+          <a href="#/cart" class="nav-link">我的购物车</a>
+          <a href="#/login" class="nav-link" id="login-link">登录/注册</a>
+        </div>
       </div>
     `;
-    
-    this.element = header;
-    
-    // 初始化搜索栏
-    this.initSearchBar();
-    
-    // 加载购物车数量
-    this.loadCartCount();
-    
-    return header;
+    this.element = div;
+    this.addStyles();
+    this.updateLoginStatus(); // 初始化登录状态显示
+    return div;
   }
 
-  // 初始化搜索栏
-  initSearchBar() {
-    this.searchBar = new SearchBar();
-    const searchBarContainer = this.element.querySelector('#search-bar-container');
-    searchBarContainer.appendChild(this.searchBar.createElement());
+  // 添加导航栏样式
+  addStyles() {
+    const style = document.createElement('style');
+    style.textContent = `
+      .global-header {
+        background: #ff6b81;
+        color: white;
+        padding: 15px 0;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      }
+      .header-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 20px;
+      }
+      .logo { margin: 0; font-size: 20px; }
+      .nav-links { display: flex; gap: 20px; }
+      .nav-link {
+        color: white;
+        text-decoration: none;
+        font-size: 16px;
+        cursor: pointer;
+      }
+      .nav-link:hover { text-decoration: underline; }
+    `;
+    this.element.appendChild(style);
   }
 
-  // 加载购物车数量
-  loadCartCount() {
-    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    this.cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-    this.updateCartCountDisplay();
-  }
-
-  // 更新购物车数量显示
-  updateCartCountDisplay() {
-    const cartCountElement = this.element.querySelector('#cart-count');
-    if (cartCountElement) {
-      cartCountElement.textContent = this.cartCount;
+  // 更新登录状态（登录后显示用户名，而非登录按钮）
+  updateLoginStatus() {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const loginLink = this.element.querySelector('#login-link');
+    if (user) {
+      loginLink.textContent = `欢迎：${user.username}`;
+      loginLink.href = 'javascript:void(0)';
+      loginLink.addEventListener('click', () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.hash = '#/products';
+        this.updateLoginStatus(); // 刷新显示
+      });
+    } else {
+      loginLink.textContent = '登录/注册';
+      loginLink.href = '#/login';
     }
-  }
-
-  // 处理购物车数量更新事件
-  handleCartCountUpdate(count) {
-    this.cartCount = count;
-    this.updateCartCountDisplay();
   }
 }
 

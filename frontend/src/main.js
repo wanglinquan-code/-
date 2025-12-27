@@ -2,10 +2,13 @@ import ProductsPage from './pages/ProductsPage.js';
 import CartPage from './pages/CartPage.js';
 import CheckoutPage from './pages/CheckoutPage.js';
 import LoginPage from './pages/LoginPage.js';
+import Header from './components/Header.js'; // 引入导航栏
 
 class App {
   constructor() {
     this.app = document.getElementById('app');
+    // 初始化导航栏
+    this.header = new Header();
     // 路由映射
     this.routes = {
       '#/products': ProductsPage,
@@ -37,8 +40,9 @@ class App {
     const Page = this.routes[hash] || this.routes['#/'];
     const page = new Page();
 
-    // 渲染页面
+    // 渲染页面：先清空，再添加导航栏，最后添加页面内容
     this.app.innerHTML = '';
+    this.app.appendChild(this.header.createElement()); // 全局显示导航栏
     this.app.appendChild(page.createElement());
     // 执行页面初始化（如加载商品）
     if (page.mount) page.mount();

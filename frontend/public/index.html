@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>电商购物平台</title>
+  <meta charset="UTF-8">
+  <title>电商购物平台</title>
+  <!-- 可选：添加favicon.ico，解决第三个报错（复制一张图标到public目录） -->
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
 </head>
 <body>
-    <div id="app"></div>
-    <script src="/dist/bundle.js"></script>
+  <!-- 根容器（必须有，main.js会挂载到这里） -->
+  <div id="app"></div>
+  <!-- 修正：直接引入bundle.js，路径是/，而非/dist/bundle.js -->
+  <script src="/bundle.js"></script>
 </body>
 </html>
