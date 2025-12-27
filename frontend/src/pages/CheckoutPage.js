@@ -272,14 +272,16 @@ class CheckoutPage {
     orderItemsContainer.innerHTML = '';
     
     this.cart.forEach(item => {
+      // 确保price是数字类型
+      const price = typeof item.price === 'string' ? parseFloat(item.price) : item.price;
       const orderItem = document.createElement('div');
       orderItem.className = 'order-item';
       orderItem.innerHTML = `
         <div>
           <div class="order-item-name">${item.name}</div>
-          <div class="order-item-info">数量: ${item.quantity} x ¥${item.price.toFixed(2)}</div>
+          <div class="order-item-info">数量: ${item.quantity} x ¥${price.toFixed(2)}</div>
         </div>
-        <div>¥${(item.price * item.quantity).toFixed(2)}</div>
+        <div>¥${(price * item.quantity).toFixed(2)}</div>
       `;
       orderItemsContainer.appendChild(orderItem);
     });
@@ -287,7 +289,11 @@ class CheckoutPage {
 
   // 更新订单总价
   updateOrderTotal() {
-    const subtotal = this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    // 确保price是数字类型
+    const subtotal = this.cart.reduce((sum, item) => {
+      const price = typeof item.price === 'string' ? parseFloat(item.price) : item.price;
+      return sum + (price * item.quantity);
+    }, 0);
     const shipping = subtotal >= 99 ? 0 : 10; // 满99免运费
     const total = subtotal + shipping;
     
