@@ -1,25 +1,12 @@
 const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   entry: './src/main.js',
   output: {
+    path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.js',
-    path: path.resolve(__dirname, 'public/dist'),
-    publicPath: '/'
-  },
-  mode: 'development',
-  devServer: {
-    static: path.resolve(__dirname, 'public'),
-    port: 8080,
-    open: true,
-    hot: true,
-    // 跨域代理（前端请求/api自动转发到后端3001端口）
-    proxy: {
-      '/api': {
-        target: 'http://localhost:3001',
-        changeOrigin: true
-      }
-    }
+    publicPath: '/',
   },
   module: {
     rules: [
@@ -29,10 +16,45 @@ module.exports = {
         use: {
           loader: 'babel-loader',
           options: {
-            presets: ['@babel/preset-env']
-          }
-        }
-      }
-    ]
-  }
+            presets: ['@babel/preset-env'],
+          },
+        },
+      },
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader'],
+      },
+      {
+        test: /\.(png|jpg|gif|svg)$/,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              limit: 8192,
+              name: '[name].[hash:8].[ext]',
+              outputPath: 'assets/',
+            },
+          },
+        ],
+      },
+    ],
+  },
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: './public/index.html',
+      filename: 'index.html',
+    }),
+  ],
+  devServer: {
+    static: {
+      directory: path.join(__dirname, 'public'),
+    },
+    compress: true,
+    port: 8080,
+    open: true,
+    historyApiFallback: true,
+  },
+  resolve: {
+    extensions: ['.js', '.json'],
+  },
 };
