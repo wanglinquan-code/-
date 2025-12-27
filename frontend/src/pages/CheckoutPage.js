@@ -294,16 +294,16 @@ class CheckoutPage {
       const price = typeof item.price === 'string' ? parseFloat(item.price) : item.price;
       return sum + (price * item.quantity);
     }, 0);
-    const shipping = subtotal >= 99 ? 0 : 10; // 满99免运费
-    const total = subtotal + shipping;
+    const shippingCost = subtotal >= 99 ? 0 : 10; // 满99免运费
+    const total = subtotal + shippingCost;
     
     this.element.querySelector('#subtotal').textContent = `¥${subtotal.toFixed(2)}`;
-    this.element.querySelector('#shipping').textContent = `¥${shipping.toFixed(2)}`;
+    this.element.querySelector('#shipping').textContent = `¥${shippingCost.toFixed(2)}`;
     this.element.querySelector('#total').textContent = `¥${total.toFixed(2)}`;
     
     // 保存订单总价
     this.order.subtotal = subtotal;
-    this.order.shipping = shipping;
+    this.order.shippingCost = shippingCost;
     this.order.total = total;
   }
 
@@ -325,17 +325,32 @@ class CheckoutPage {
       paymentMethod: formData.get('paymentMethod')
     };
     
+    // 获取当前用户信息
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    
+    // 计算订单总额
+    const subtotal = this.cart.reduce((sum, item) => {
+      const price = typeof item.price === 'string' ? parseFloat(item.price) : item.price;
+      return sum + (price * item.quantity);
+    }, 0);
+    const shippingCost = subtotal >= 99 ? 0 : 10;
+    const total = subtotal + shippingCost;
+    
     // 生成订单数据
     const orderId = 'ORDER' + Date.now();
-    const orderDate = new Date().toISOString();
+    const createdAt = new Date().toISOString();
     
     this.order = {
-      ...this.order,
       id: orderId,
-      orderDate,
+      userId: user.id || null,
+      username: user.username || 'guest',
+      createdAt,
       status: 'pending',
-      shippingInfo,
-      items: this.cart
+      shipping: shippingInfo,
+      items: this.cart,
+      subtotal,
+      shippingCost,
+      total
     };
     
     // 保存订单到本地存储

@@ -65,21 +65,45 @@ class LoginPage {
       const username = this.element.querySelector('#username').value.trim();
       const password = this.element.querySelector('#password').value.trim();
       const errorEl = this.element.querySelector('#error');
+      const submitBtn = this.element.querySelector('.submit-btn');
+      
       errorEl.textContent = '';
+      
+      // 验证输入
+      if (!username || !password) {
+        errorEl.textContent = '用户名和密码不能为空';
+        return;
+      }
 
       try {
+        submitBtn.disabled = true;
+        submitBtn.textContent = this.isRegister ? '注册中...' : '登录中...';
+        
         if (this.isRegister) {
           await register(username, password);
-          alert('注册成功！请登录');
+          errorEl.style.color = '#4caf50';
+          errorEl.textContent = '注册成功！请用新账号登录';
           this.isRegister = false;
-          this.element.replaceWith(this.createElement());
+          
+          // 2秒后显示登录界面
+          setTimeout(() => {
+            this.element.replaceWith(this.createElement());
+          }, 2000);
         } else {
-          await login(username, password);
+          const result = await login(username, password);
+          
+          // 验证响应数据
+          if (!result.token || !result.user) {
+            throw new Error('登录数据异常');
+          }
+          
           alert('登录成功！');
-          window.location.hash = '#/products'; // 跳转到商品页
+          window.location.hash = '#/products';
         }
       } catch (error) {
-        errorEl.textContent = error.message;
+        errorEl.textContent = error.message || '操作失败，请重试';
+        submitBtn.disabled = false;
+        submitBtn.textContent = this.isRegister ? '注册' : '登录';
       }
     });
   }

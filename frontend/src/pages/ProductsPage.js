@@ -95,24 +95,50 @@ class ProductsPage {
     this.products.forEach(product => {
       const item = document.createElement('div');
       item.className = 'product-item';
+      
+      // 确保price是数字格式
+      const displayPrice = typeof product.price === 'string' ? parseFloat(product.price).toFixed(2) : product.price.toFixed(2);
+      
       item.innerHTML = `
         <h3>${product.name}</h3>
-        <div class="price">¥${product.price}</div>
+        <div class="price">¥${displayPrice}</div>
         <div class="desc">${product.description || '暂无描述'}</div>
-        <button data-id="${product.id}">加入购物车</button>
+        <button data-id="${product.id}" data-name="${product.name}" data-price="${product.price}">加入购物车</button>
       `;
 
       // 加入购物车事件（存储到localStorage）
-      item.querySelector('button').addEventListener('click', () => {
+      item.querySelector('button').addEventListener('click', (e) => {
+        const btn = e.target;
+        const productId = parseInt(btn.dataset.id);
+        const productName = btn.dataset.name;
+        const productPrice = btn.dataset.price;
+        
         const cart = JSON.parse(localStorage.getItem('cart')) || [];
-        const existing = cart.find(item => item.id === product.id);
+        const existing = cart.find(cartItem => cartItem.id === productId);
+        
         if (existing) {
           existing.quantity += 1;
         } else {
-          cart.push({ ...product, quantity: 1 });
+          cart.push({
+            id: productId,
+            name: productName,
+            price: productPrice,
+            imageUrl: product.imageUrl || '',
+            description: product.description || '',
+            quantity: 1
+          });
         }
+        
         localStorage.setItem('cart', JSON.stringify(cart));
-        alert(`${product.name} 已加入购物车！`);
+        
+        // 显示成功提示
+        const originalText = btn.textContent;
+        btn.textContent = '✓ 已加入';
+        btn.disabled = true;
+        setTimeout(() => {
+          btn.textContent = originalText;
+          btn.disabled = false;
+        }, 1500);
       });
 
       productList.appendChild(item);

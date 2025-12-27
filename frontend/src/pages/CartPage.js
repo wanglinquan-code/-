@@ -227,7 +227,12 @@ class CartPage {
   // 更新购物车摘要信息
   updateCartSummary() {
     const totalItems = this.cart.reduce((sum, item) => sum + item.quantity, 0);
-    const totalPrice = this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    
+    // 计算总价，确保price被转换为数字
+    const totalPrice = this.cart.reduce((sum, item) => {
+      const price = typeof item.price === 'string' ? parseFloat(item.price) : item.price;
+      return sum + (price * item.quantity);
+    }, 0);
     
     const totalItemsElement = this.element.querySelector('#total-items');
     const totalPriceElement = this.element.querySelector('#total-price');
