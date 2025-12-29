@@ -11,7 +11,7 @@ class SearchBar {
     div.className = 'search-box';
     div.innerHTML = `
       <input type="text" class="search-input" placeholder="搜索商品..." id="search-input">
-      <button class="search-btn" id="search-btn">搜索</button>
+      <button class="search-btn btn" id="search-btn">搜索</button>
     `;
     
     this.element = div;

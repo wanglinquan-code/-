@@ -22,7 +22,7 @@ class LoginPage {
             <input type="password" id="password" required placeholder="请输入密码">
           </div>
           <div class="error" id="error"></div>
-          <button type="submit" class="submit-btn">${this.isRegister ? '注册' : '登录'}</button>
+          <button type="submit" class="btn btn-primary submit-btn">${this.isRegister ? '注册' : '登录'}</button>
         </form>
         <p class="toggle">
           ${this.isRegister ? '已有账号？' : '没有账号？'}
@@ -44,7 +44,7 @@ class LoginPage {
       .form-group { margin-bottom: 15px; }
       .form-group label { display: block; margin-bottom: 5px; }
       .form-group input { width: 100%; padding: 8px; box-sizing: border-box; }
-      .submit-btn { width: 100%; padding: 10px; background: #ff6b81; color: white; border: none; border-radius: 4px; cursor: pointer; }
+      .submit-btn { width: 100%; padding: 10px; border-radius: 8px; cursor: pointer; }
       .error { color: red; margin: 10px 0; min-height: 20px; }
       .toggle { text-align: center; margin-top: 15px; }
       #toggle-btn { color: #ff6b81; cursor: pointer; text-decoration: underline; }
