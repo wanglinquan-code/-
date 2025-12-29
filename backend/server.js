@@ -3,6 +3,7 @@ const cors = require('cors');
 const pool = require('./db');
 const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/products');
+const usersRoutes = require('./routes/users');
 
 const app = express();
 const PORT = 3001;
@@ -12,8 +13,9 @@ app.use(cors());
 app.use(express.json()); // 解析JSON请求体
 
 // 路由
-app.use('/api/auth', authRoutes);
-app.use('/api/products', productRoutes);
+  app.use('/api/auth', authRoutes);
+  app.use('/api/products', productRoutes);
+  app.use('/api/users', usersRoutes);
 
 // 初始化数据库表
 async function initDB() {
@@ -24,6 +26,8 @@ async function initDB() {
         id INT AUTO_INCREMENT PRIMARY KEY,
         username VARCHAR(50) NOT NULL UNIQUE,
         password VARCHAR(255) NOT NULL,
+        email VARCHAR(100),
+        phone VARCHAR(30),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     `);

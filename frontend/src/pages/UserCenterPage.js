@@ -82,14 +82,7 @@ class UserCenterPage {
                   <label>用户名</label>
                   <input type="text" id="username-display" readonly>
                 </div>
-                <div class="form-item">
-                  <label>邮箱</label>
-                  <input type="email" id="email-display" placeholder="未设置">
-                </div>
-                <div class="form-item">
-                  <label>电话</label>
-                  <input type="tel" id="phone-display" placeholder="未设置">
-                </div>
+                <!-- 已移除邮箱与电话显示 -->
                 <div class="form-item">
                   <label>注册时间</label>
                   <input type="text" id="joindate-display" readonly>
@@ -131,14 +124,11 @@ class UserCenterPage {
   // 加载用户信息
   loadUserInfo() {
     const usernameDisplay = this.element.querySelector('#username-display');
-    const emailDisplay = this.element.querySelector('#email-display');
-    const phoneDisplay = this.element.querySelector('#phone-display');
+    // 邮箱与电话已从个人信息中移除
     const joindateDisplay = this.element.querySelector('#joindate-display');
 
     if (this.user) {
       usernameDisplay.value = this.user.username || '';
-      emailDisplay.value = this.user.email || '';
-      phoneDisplay.value = this.user.phone || '';
       joindateDisplay.value = this.user.createdAt 
         ? new Date(this.user.createdAt).toLocaleDateString('zh-CN')
         : new Date().toLocaleDateString('zh-CN');
@@ -225,14 +215,14 @@ class UserCenterPage {
           </div>
         </div>
 
-        <div class="order-card-footer">
+          <div class="order-card-footer">
           <div class="order-total">
             <span>订单总额：</span>
             <span class="amount">¥${order.total.toFixed(2)}</span>
           </div>
           <div class="order-actions">
             <button class="btn-action" onclick="alert('功能开发中...')">申请售后</button>
-            <button class="btn-action delete" onclick="if(confirm('确定删除此订单?')) { location.reload(); }">删除订单</button>
+            <button class="btn-action delete" data-order-id="${order.id}">删除订单</button>
           </div>
         </div>
       </div>
@@ -312,6 +302,17 @@ class UserCenterPage {
     }).join('');
   }
 
+  // 删除订单
+  deleteOrder(orderId) {
+    const allOrders = JSON.parse(localStorage.getItem('orders') || '[]');
+    const filtered = allOrders.filter(o => o.id !== orderId);
+    localStorage.setItem('orders', JSON.stringify(filtered));
+
+    // 更新当前页面数据并重新渲染
+    this.orders = this.orders.filter(o => o.id !== orderId);
+    this.renderOrders();
+  }
+
   // 绑定事件
   bindEvents() {
     // 标签页切换
@@ -344,6 +345,20 @@ class UserCenterPage {
     if (addAddressBtn) {
       addAddressBtn.addEventListener('click', () => {
         alert('地址管理功能开发中...');
+      });
+    }
+
+    // 订单删除事件（事件委托）
+    const ordersList = this.element.querySelector('#orders-list');
+    if (ordersList) {
+      ordersList.addEventListener('click', (e) => {
+        const btn = e.target.closest('.btn-action.delete');
+        if (btn) {
+          const orderId = btn.dataset.orderId;
+          if (confirm('确定删除此订单?')) {
+            this.deleteOrder(orderId);
+          }
+        }
       });
     }
   }

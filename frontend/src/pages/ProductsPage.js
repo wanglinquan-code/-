@@ -37,12 +37,14 @@ class ProductsPage {
       .search-box { display: flex; gap: 10px; }
       #search-input { padding: 8px; width: 200px; }
       #search-btn { padding: 8px 16px; background: #ff6b81; color: white; border: none; border-radius: 4px; cursor: pointer; }
-      .product-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
-      .product-item { border: 1px solid #eee; padding: 15px; border-radius: 8px; }
-      .product-item h3 { margin: 0 0 10px; font-size: 18px; }
-      .product-item .price { color: #ff6b81; font-weight: bold; margin: 10px 0; }
-      .product-item .desc { color: #666; font-size: 14px; margin: 10px 0; }
-      .product-item button { background: #ff6b81; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; }
+      .product-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+      .product-item { display: flex; align-items: center; gap: 12px; border: 1px solid #eee; padding: 12px; border-radius: 8px; background: white; }
+      .product-image { width: 80px; height: 80px; object-fit: cover; border-radius: 6px; flex-shrink: 0; }
+      .product-info { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+      .product-item h3 { margin: 0; font-size: 16px; color: #333; }
+      .product-item .price { color: #ff6b81; font-weight: bold; margin: 0; }
+      .product-item .desc { color: #666; font-size: 13px; margin: 0; }
+      .product-item button { background: #ff6b81; color: white; border: none; padding: 8px 10px; border-radius: 4px; cursor: pointer; align-self: flex-start; }
       .error-message { color: red; margin-top: 20px; }
     `;
     this.element.appendChild(style);
@@ -100,9 +102,12 @@ class ProductsPage {
       const displayPrice = typeof product.price === 'string' ? parseFloat(product.price).toFixed(2) : product.price.toFixed(2);
       
       item.innerHTML = `
-        <h3>${product.name}</h3>
-        <div class="price">¥${displayPrice}</div>
-        <div class="desc">${product.description || '暂无描述'}</div>
+        <img class="product-image" src="${product.imageUrl || 'https://via.placeholder.com/80'}" alt="${product.name}">
+        <div class="product-info">
+          <h3>${product.name}</h3>
+          <div class="price">¥${displayPrice}</div>
+          <div class="desc">${product.description || '暂无描述'}</div>
+        </div>
         <button data-id="${product.id}" data-name="${product.name}" data-price="${product.price}">加入购物车</button>
       `;
 

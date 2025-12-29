@@ -19,7 +19,68 @@ class ProductItem {
     `;
     this.element = div;
     this.bindEvents();
+    this.addStyles();
     return div;
+  }
+
+  // 添加样式，使商品列表项像购物车一样显示图片
+  addStyles() {
+    const style = document.createElement('style');
+    style.textContent = `
+      .product-item {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        background: white;
+        padding: 12px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        margin-bottom: 12px;
+      }
+
+      .product-image {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 6px;
+        flex-shrink: 0;
+      }
+
+      .product-info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .product-name {
+        margin: 0;
+        font-size: 16px;
+        color: #333;
+      }
+
+      .product-price {
+        margin: 0;
+        color: #ff6b81;
+        font-weight: 600;
+      }
+
+      .add-to-cart-btn {
+        align-self: start;
+        background: #ff6b81;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+
+      .add-to-cart-btn:hover {
+        background: #ff4757;
+      }
+    `;
+    document.head.appendChild(style);
   }
 
   // 绑定事件

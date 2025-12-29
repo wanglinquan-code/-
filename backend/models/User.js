@@ -11,6 +11,21 @@ class User {
     return rows[0];
   }
 
+  // 根据ID查用户
+  static async findById(id) {
+    const [rows] = await pool.execute(
+      'SELECT * FROM users WHERE id = ?',
+      [id]
+    );
+    return rows[0];
+  }
+
+  // 获取所有用户
+  static async findAll() {
+    const [rows] = await pool.execute('SELECT id, username, created_at, email, phone FROM users');
+    return rows;
+  }
+
   // 创建用户（注册）
   static async create(username, password) {
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -24,6 +39,15 @@ class User {
   // 验证密码
   static async verifyPassword(user, password) {
     return bcrypt.compare(password, user.password);
+  }
+
+  // 更新用户资料（email, phone）
+  static async updateProfile(id, { email, phone }) {
+    const [result] = await pool.execute(
+      'UPDATE users SET email = ?, phone = ? WHERE id = ?',
+      [email || null, phone || null, id]
+    );
+    return result.affectedRows > 0;
   }
 }
 
